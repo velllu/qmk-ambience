@@ -2,6 +2,7 @@ use x11::xlib::{
     Display, Window, XAllPlanes, XDestroyImage, XGetImage, XGetPixel, XWindowAttributes, ZPixmap,
 };
 
+#[derive(PartialEq)]
 pub struct Color {
     pub r: u8,
     pub g: u8,

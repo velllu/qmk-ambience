@@ -57,6 +57,8 @@ fn main() {
         .open_device(&api)
         .unwrap();
 
+    let mut previous_color: Option<color::Color> = None;
+
     loop {
         let mut root = unsafe { XDefaultRootWindow(display) };
         let mut attributes: XWindowAttributes = new_window_attributes();
@@ -64,7 +66,19 @@ fn main() {
 
         let average_color = color::get_average_color(display, &mut root, attributes);
 
-        device.write(&[0x00, average_color.r, average_color.g, average_color.b]);
+        if previous_color.is_some() {
+            if average_color != previous_color.unwrap() {
+                #[cfg(debug_assertions)]
+                println!(
+                    "Sent color: #{:x}{:x}{:x}",
+                    average_color.r, average_color.g, average_color.b
+                );
+
+                device.write(&[0x00, average_color.r, average_color.g, average_color.b]);
+            }
+        }
+
+        previous_color = Some(average_color);
 
         std::thread::sleep(Duration::from_millis(500));
     }
