@@ -2,7 +2,10 @@
 Make your keyboard follow the display colors.
 
 # TODOs
-- [ ] Add a proper color picking algorithm (like pywal's) instead of just averaging the colors. This often gives a bland grey color.
+- [-] Add a proper color picking algorithm (like pywal's) instead of just averaging the colors. This often gives a bland grey color.
+    - [x] Simple averaging algorithm
+    - [x] Most used algorithm (picks the most used color in the screen)
+    - [ ] Still have to figure out one I am 100% satisfied with
 - [ ] Add wayland support.
 - [ ] Make color transitions smoother.
 - [ ] Add possibility to customize the delay of sending colors to the keyboard. (As of now, to change it, you can go change the `std::thread::sleep(Duration::from_millis(500))` in `client/src/main.rs` to whatever you want)

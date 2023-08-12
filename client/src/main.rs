@@ -1,16 +1,13 @@
-#![allow(unused)]
-
-use hidapi::{DeviceInfo, HidApi};
+use gumdrop::Options;
+use hidapi::HidApi;
 use std::{
     ptr::{null, null_mut},
     time::Duration,
 };
-use x11::xlib::{
-    Display, XDefaultRootWindow, XDestroyWindow, XGetWindowAttributes, XOpenDisplay,
-    XWindowAttributes,
-};
+use x11::xlib::{XDefaultRootWindow, XGetWindowAttributes, XOpenDisplay, XWindowAttributes};
 
 mod color;
+mod command_parsing;
 mod hid;
 
 fn new_window_attributes() -> XWindowAttributes {
@@ -43,6 +40,8 @@ fn new_window_attributes() -> XWindowAttributes {
 }
 
 fn main() {
+    let args = command_parsing::Arguments::parse_args_default_or_exit();
+
     let display = unsafe { XOpenDisplay(null()) };
     if display.is_null() {
         panic!("Can't open monitor");
@@ -64,7 +63,8 @@ fn main() {
         let mut attributes: XWindowAttributes = new_window_attributes();
         unsafe { XGetWindowAttributes(display, root, &mut attributes) };
 
-        let average_color = color::get_average_color(display, &mut root, attributes);
+        let average_color =
+            color::get_average_color(display, &mut root, attributes, &args.algorithm);
 
         if previous_color.is_some() {
             if average_color != previous_color.unwrap() {
@@ -74,7 +74,7 @@ fn main() {
                     average_color.r, average_color.g, average_color.b
                 );
 
-                device.write(&[0x00, average_color.r, average_color.g, average_color.b]);
+                let _ = device.write(&[0x00, average_color.r, average_color.g, average_color.b]);
             }
         }
 
@@ -82,6 +82,4 @@ fn main() {
 
         std::thread::sleep(Duration::from_millis(500));
     }
-
-    unsafe { XDestroyWindow(display, 0) };
 }

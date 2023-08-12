@@ -5,6 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+benchmark = []
+
 [dependencies]
-hidapi = "2.4.1"
-x11 = { version = "2.21.0", features = ["xlib"] }
+gumdrop = "0.8.1" # For argument parsing
+hidapi = "2.4.1" # For sending colors to the keyboard
+x11 = { version = "2.21.0", features = ["xlib"] } # To get the colors from your screen
