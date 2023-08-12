@@ -9,6 +9,7 @@ Make your keyboard follow the display colors.
 - [ ] Add wayland support.
 - [ ] Make color transitions smoother.
 - [ ] Add possibility to customize the delay of sending colors to the keyboard. (As of now, to change it, you can go change the `std::thread::sleep(Duration::from_millis(500))` in `client/src/main.rs` to whatever you want)
+- [ ] Add benchmarks for every algorithm
 
 # Installing
 ## Flashing firmware into the keyboard
@@ -69,3 +70,23 @@ You have three ways of installing the client
 2. (Reccomended) If you have rust's cargo installed, you can `cd client/` and run `cargo install --path .`, you will now have `qmk-ambience-client` as a binary on your system (if you set your PATH to include rust programs).
 3. (Reccomended too) You can also `cd client/` and run `cargo build --release` and running `target/release/qmk-ambience-client`.
 4. You can pick the precompiled binary in the releases tab (if I remember to upload it).
+
+# Client instructions
+You can run the client with just this:  
+```bash
+# \/ the binary changes depending on you installed the client
+qmk-ambience-client
+```
+
+## Different algorithms
+### Simple Averaging
+This is the simplest and fastest one, but the one I think looks worse.
+```bash
+qmk-ambience-client --algorithm simple-average
+```
+
+### Most Used (default)
+This picks the most used color, it's more slower then the simple average but still very fast.
+```bash
+qmk-ambience-client # you can also set `--algorithm most-used` but it's already the default
+```
