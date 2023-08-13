@@ -1,21 +1,15 @@
 #[cfg(feature = "benchmark")]
 use std::time::Instant;
 
-use crate::command_parsing::Algorithm;
+use super::types::RGB;
 use std::{collections::HashMap, ops::Add};
-use x11::xlib::{
-    Display, Window, XAllPlanes, XDestroyImage, XGetImage, XGetPixel, XImage, XWindowAttributes,
-    ZPixmap,
-};
+use x11::xlib::{XGetPixel, XImage};
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
-pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-}
-
-fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> Color {
+/// 1. Adds all screen RGB values into three counters
+/// 2. Divide them by the pixel count
+/// 3. Boom, you get a color that looks like ass most of the time but is very fast to
+/// compute
+pub fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
     let (mut r, mut g, mut b) = (0u64, 0u64, 0u64);
 
     for x in 0..width {
@@ -32,18 +26,20 @@ fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> Color {
     let g: u8 = (g / total_pixels) as u8;
     let b: u8 = (b / total_pixels) as u8;
 
-    Color { r, g, b }
+    RGB { r, g, b }
 }
 
-fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> Color {
+/// 1. Count how much each Color is used
+/// 2. Get the most used one
+pub fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
     // The value will be how many pixels of the color there are on the screen
-    let mut colors: HashMap<Color, u32> = HashMap::new();
+    let mut colors: HashMap<RGB, u32> = HashMap::new();
 
     // i looooove nested loops!!
     for x in 0..width {
         for y in 0..height {
             let pixel = unsafe { XGetPixel(screenshot, x as i32, y as i32) };
-            let color = Color {
+            let color = RGB {
                 r: ((pixel >> 16) & 0xFF) as u8,
                 g: ((pixel >> 8) & 0xFF) as u8,
                 b: (pixel & 0xFF) as u8,
@@ -62,7 +58,7 @@ fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> Color {
     }
 
     let mut max_value: u32 = 0;
-    let mut most_used_color: Option<Color> = None;
+    let mut most_used_color: Option<RGB> = None;
 
     for (color, number_of_pixels) in colors.iter() {
         if *number_of_pixels > max_value {
@@ -80,34 +76,6 @@ fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> Color {
     if most_used_color.is_some() {
         most_used_color.unwrap()
     } else {
-        Color { r: 0, g: 0, b: 0 }
+        RGB { r: 0, g: 0, b: 0 }
     }
-}
-
-pub fn get_average_color(
-    display: *mut Display,
-    window: *mut Window,
-    attr: XWindowAttributes,
-    algorithm: &Algorithm,
-) -> Color {
-    let width = attr.width as u32;
-    let height = attr.height as u32;
-
-    let screenshot =
-        unsafe { XGetImage(display, *window, 0, 0, width, height, XAllPlanes(), ZPixmap) };
-
-    #[cfg(feature = "benchmark")]
-    let start_time = Instant::now();
-
-    let averaged_color = match algorithm {
-        Algorithm::SimpleAverage => simple_average(screenshot, width, height),
-        Algorithm::MostUsed => most_used(screenshot, width, height),
-    };
-
-    #[cfg(feature = "benchmark")]
-    println!("Elapsed time: {:?}", Instant::now() - start_time);
-
-    unsafe { XDestroyImage(screenshot) };
-
-    return averaged_color;
 }

@@ -1,3 +1,4 @@
+use color::types::RGB;
 use gumdrop::Options;
 use hidapi::HidApi;
 use std::{
@@ -56,7 +57,7 @@ fn main() {
         .open_device(&api)
         .unwrap();
 
-    let mut previous_color: Option<color::Color> = None;
+    let mut previous_color: Option<RGB> = None;
 
     loop {
         let mut root = unsafe { XDefaultRootWindow(display) };
