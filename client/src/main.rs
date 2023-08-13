@@ -80,6 +80,6 @@ fn main() {
 
         previous_color = Some(average_color);
 
-        std::thread::sleep(Duration::from_millis(500));
+        std::thread::sleep(Duration::from_millis(args.ms));
     }
 }

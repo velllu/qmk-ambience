@@ -6,6 +6,9 @@ use gumdrop::Options;
 pub struct Arguments {
     #[options(default = "most-used")]
     pub algorithm: Algorithm,
+
+    #[options(default = "500")]
+    pub ms: u64,
 }
 
 #[derive(Debug, PartialEq, Eq)]

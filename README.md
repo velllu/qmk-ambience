@@ -8,7 +8,7 @@ Make your keyboard follow the display colors.
     - [ ] Still have to figure out one I am 100% satisfied with
 - [ ] Add wayland support.
 - [ ] Make color transitions smoother.
-- [ ] Add possibility to customize the delay of sending colors to the keyboard. (As of now, to change it, you can go change the `std::thread::sleep(Duration::from_millis(500))` in `client/src/main.rs` to whatever you want)
+- [x] Add possibility to customize the delay of sending colors to the keyboard.
 - [ ] Add benchmarks for every algorithm
 
 # Installing
@@ -86,7 +86,13 @@ qmk-ambience-client --algorithm simple-average
 ```
 
 ### Most Used (default)
-This picks the most used color, it's more slower then the simple average but still very fast.
+This picks the most used color, it's slower then the simple average but still very fast.
 ```bash
 qmk-ambience-client # you can also set `--algorithm most-used` but it's already the default
+```
+
+## Delay
+The default delay between each color average calculation can be set with the `--ms` flag. By default it's 500 milliseconds.  
+```bash
+qmk-ambience-client --ms 200
 ```
