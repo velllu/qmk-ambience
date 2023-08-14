@@ -1,6 +1,12 @@
+#[cfg(feature = "benchmark")]
+use std::time::Instant;
+
 use super::types::RGB;
 use crate::{
-    color::algorithms::{most_used, simple_average},
+    color::{
+        algorithms::{most_used, simple_average},
+        types::HSV,
+    },
     command_parsing::Algorithm,
 };
 use x11::xlib::{
@@ -35,6 +41,15 @@ pub fn get_average_color(
         "Choosen color: \x1b[48;2;{};{};{}m\x1b[30m             \x1b[0m\n",
         averaged_color.r, averaged_color.g, averaged_color.b
     );
+
+    #[cfg(debug_assertions)]
+    {
+        let hsv: HSV = averaged_color.into();
+        println!(
+            "R: {:x}, G: {:x}, B: {:x}.    H: {}, S: {}, V: {}",
+            averaged_color.r, averaged_color.g, averaged_color.b, hsv.h, hsv.s, hsv.v
+        );
+    }
 
     unsafe { XDestroyImage(screenshot) };
 

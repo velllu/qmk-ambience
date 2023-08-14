@@ -2,10 +2,10 @@
 Make your keyboard follow the display colors.
 
 # TODOs
-- [-] Add a proper color picking algorithm (like pywal's) instead of just averaging the colors. This often gives a bland grey color.
+- [x] Add a proper color picking algorithm (like pywal's) instead of just averaging the colors. This often gives a bland grey color.
     - [x] Simple averaging algorithm
     - [x] Most used algorithm (picks the most used color in the screen)
-    - [ ] Still have to figure out one I am 100% satisfied with
+        - [ ] Further improvements can be made by making it add colors that are not precisely it, but close.
 - [ ] Add wayland support.
 - [ ] Make color transitions smoother.
 - [x] Add possibility to customize the delay of sending colors to the keyboard.
@@ -86,7 +86,8 @@ qmk-ambience-client --algorithm simple-average
 ```
 
 ### Most Used (default)
-This picks the most used color, it's slower then the simple average but still very fast.
+This picks the most used color, it's slower then the simple average but still very fast.  
+It also counts the pixels with an actual color (not white/black) and brighter, as more pixels, this makes it actually very accurate.  
 ```bash
 qmk-ambience-client # you can also set `--algorithm most-used` but it's already the default
 ```

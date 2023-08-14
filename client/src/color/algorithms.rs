@@ -2,6 +2,7 @@
 use std::time::Instant;
 
 use super::types::RGB;
+use crate::color::types::HSV;
 use std::{collections::HashMap, ops::Add};
 use x11::xlib::{XGetPixel, XImage};
 
@@ -29,11 +30,11 @@ pub fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
     RGB { r, g, b }
 }
 
-/// 1. Count how much each Color is used
+/// 1. Count how much each Color is used, make brighter colors be counted as more
 /// 2. Get the most used one
 pub fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
     // The value will be how many pixels of the color there are on the screen
-    let mut colors: HashMap<RGB, u32> = HashMap::new();
+    let mut colors: HashMap<RGB, f32> = HashMap::new();
 
     // i looooove nested loops!!
     for x in 0..width {
@@ -47,17 +48,18 @@ pub fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
 
             match colors.get(&color) {
                 Some(existing_value) => {
-                    colors.insert(color, existing_value.add(1));
+                    let color_hsv: HSV = color.into();
+                    colors.insert(color, existing_value.add(color_hsv.s * color_hsv.v));
                 }
 
                 None => {
-                    colors.insert(color, 0);
+                    colors.insert(color, 0.);
                 }
             }
         }
     }
 
-    let mut max_value: u32 = 0;
+    let mut max_value: f32 = 0.;
     let mut most_used_color: Option<RGB> = None;
 
     for (color, number_of_pixels) in colors.iter() {
