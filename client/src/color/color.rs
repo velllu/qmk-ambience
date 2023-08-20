@@ -1,6 +1,8 @@
 #[cfg(feature = "benchmark")]
 use std::time::Instant;
 
+use undici::x11::window::Window;
+
 use super::types::RGB;
 use crate::{
     color::{
@@ -9,21 +11,11 @@ use crate::{
     },
     command_parsing::Algorithm,
 };
-use x11::xlib::{
-    Display, Window, XAllPlanes, XDestroyImage, XGetImage, XWindowAttributes, ZPixmap,
-};
 
-pub fn get_average_color(
-    display: *mut Display,
-    window: *mut Window,
-    attr: XWindowAttributes,
-    algorithm: &Algorithm,
-) -> RGB {
-    let width = attr.width as u32;
-    let height = attr.height as u32;
-
-    let screenshot =
-        unsafe { XGetImage(display, *window, 0, 0, width, height, XAllPlanes(), ZPixmap) };
+pub fn get_average_color(root_window: &Window, algorithm: &Algorithm) -> RGB {
+    let screenshot = root_window.get_image();
+    let width = screenshot.width;
+    let height = screenshot.height;
 
     #[cfg(feature = "benchmark")]
     let start_time = Instant::now();
@@ -50,8 +42,6 @@ pub fn get_average_color(
             averaged_color.r, averaged_color.g, averaged_color.b, hsv.h, hsv.s, hsv.v
         );
     }
-
-    unsafe { XDestroyImage(screenshot) };
 
     return averaged_color;
 }

@@ -1,24 +1,25 @@
 #[cfg(feature = "benchmark")]
 use std::time::Instant;
 
+use undici::x11::{common::Vector2, image::Image};
+
 use super::types::RGB;
 use crate::color::types::HSV;
 use std::{collections::HashMap, ops::Add};
-use x11::xlib::{XGetPixel, XImage};
 
 /// 1. Adds all screen RGB values into three counters
 /// 2. Divide them by the pixel count
 /// 3. Boom, you get a color that looks like ass most of the time but is very fast to
 /// compute
-pub fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
+pub fn simple_average(screenshot: Image, width: u32, height: u32) -> RGB {
     let (mut r, mut g, mut b) = (0u64, 0u64, 0u64);
 
     for x in 0..width {
         for y in 0..height {
-            let pixel = unsafe { XGetPixel(screenshot, x as i32, y as i32) };
-            r += (pixel >> 16) & 0xFF;
-            g += (pixel >> 8) & 0xFF;
-            b += pixel & 0xFF;
+            let pixel = screenshot.get_pixel(Vector2::new(x as i32, y as i32));
+            r += pixel.r as u64;
+            g += pixel.g as u64;
+            b += pixel.b as u64;
         }
     }
 
@@ -32,18 +33,18 @@ pub fn simple_average(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
 
 /// 1. Count how much each Color is used, make brighter colors be counted as more
 /// 2. Get the most used one
-pub fn most_used(screenshot: *mut XImage, width: u32, height: u32) -> RGB {
+pub fn most_used(screenshot: Image, width: u32, height: u32) -> RGB {
     // The value will be how many pixels of the color there are on the screen
     let mut colors: HashMap<RGB, f32> = HashMap::new();
 
     // i looooove nested loops!!
     for x in 0..width {
         for y in 0..height {
-            let pixel = unsafe { XGetPixel(screenshot, x as i32, y as i32) };
+            let pixel = screenshot.get_pixel(Vector2::new(x as i32, y as i32));
             let color = RGB {
-                r: ((pixel >> 16) & 0xFF) as u8,
-                g: ((pixel >> 8) & 0xFF) as u8,
-                b: (pixel & 0xFF) as u8,
+                r: pixel.r,
+                g: pixel.g,
+                b: pixel.b,
             };
 
             match colors.get(&color) {

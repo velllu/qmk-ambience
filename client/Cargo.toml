@@ -11,4 +11,4 @@ benchmark = []
 [dependencies]
 gumdrop = "0.8.1" # For argument parsing
 hidapi = "2.4.1" # For sending colors to the keyboard
-x11 = { version = "2.21.0", features = ["xlib"] } # To get the colors from your screen
+undici = { git = "https://github.com/velllu/undici", rev = "1692114" }
