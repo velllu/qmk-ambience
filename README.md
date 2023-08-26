@@ -7,7 +7,7 @@ Make your keyboard follow the display colors.
     - [x] Most used algorithm (picks the most used color in the screen)
         - [ ] Further improvements can be made by making it add colors that are not precisely it, but close.
 - [ ] Add wayland support.
-- [ ] Make color transitions smoother.
+- [x] Make color transitions smoother.
 - [x] Add possibility to customize the delay of sending colors to the keyboard.
 - [ ] Add benchmarks for every algorithm
 
